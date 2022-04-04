@@ -3,6 +3,8 @@ package multiconfig
 import (
 	"testing"
 	"time"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 type (
@@ -32,18 +34,44 @@ type (
 		Name     string `required:"true"`
 		Postgres `structs:",flatten"`
 	}
+
+	FlattenedServer struct {
+		Postgres Postgres
+	}
+
+	CamelCaseServer struct {
+		AccessKey         string
+		Normal            string
+		DBName            string `default:"configdb"`
+		AvailabilityRatio float64
+	}
+
+	// App holds services including an API, a Database and a Server
+	App struct {
+		API      API
+		Service1 AppServer
+		Service2 AppServer
+		Mongo    Database
+	}
+
+	AppServer struct {
+		Scheme   string `default:"https"`
+		Host     string
+		Port     int
+		Username string
+		Password string
+	}
+
+	API struct {
+		AppServer
+		Test bool
+	}
+
+	Database struct {
+		AppServer
+		DBName string
+	}
 )
-
-type FlattenedServer struct {
-	Postgres Postgres
-}
-
-type CamelCaseServer struct {
-	AccessKey         string
-	Normal            string
-	DBName            string `default:"configdb"`
-	AvailabilityRatio float64
-}
 
 var (
 	testTOML = "testdata/config.toml"
@@ -76,6 +104,39 @@ func getDefaultCamelCaseServer() *CamelCaseServer {
 		Normal:            "normal",
 		DBName:            "configdb",
 		AvailabilityRatio: 8.23,
+	}
+}
+
+func getDefaultApp() *App {
+	return &App{
+		API: API{
+			AppServer: AppServer{
+				Scheme: "https",
+				Host:   "api.myapp.com",
+				Port:   81,
+			},
+			Test: false,
+		},
+		Service1: AppServer{
+			Scheme: "https",
+			Host:   "service1.myapp.com",
+			Port:   82,
+		},
+		Service2: AppServer{
+			Scheme: "https",
+			Host:   "service2.myapp.com",
+			Port:   83,
+		},
+		Mongo: Database{
+			DBName: "myDatabase",
+			AppServer: AppServer{
+				Scheme:   "mongodb",
+				Host:     "localhost",
+				Port:     27017,
+				Username: "admin",
+				Password: "admin",
+			},
+		},
 	}
 }
 
@@ -208,5 +269,18 @@ func testCamelcaseStruct(t *testing.T, s *CamelCaseServer, d *CamelCaseServer) {
 	if s.AvailabilityRatio != d.AvailabilityRatio {
 		t.Errorf("AvailabilityRatio is wrong: %f, want: %f", s.AvailabilityRatio, d.AvailabilityRatio)
 	}
+}
 
+func TestLoadApp(t *testing.T) {
+	m := NewWithPath(testTOML)
+
+	app := new(App)
+	if err := m.Load(app); err != nil {
+		t.Error(err)
+	}
+
+	opts := cmp.AllowUnexported(Server{}, Postgres{})
+	if diff := cmp.Diff(getDefaultApp(), app, opts); diff != "" {
+		t.Errorf("diff = %s", diff)
+	}
 }

@@ -1,12 +1,33 @@
 Name              = "koding"
 Enabled           = true
 Users             = ["ankara", "istanbul"]
-Interval 	  = 10000000000
-ID       	  = 1234567890
-Labels       	  = [123,456]
+Interval          = 10000000000
+ID                = 1234567890
+Labels            = [123,456]
 
 [Postgres]
 Enabled           = true
 Port              = 5432
 Hosts             = ["192.168.2.1", "192.168.2.2", "192.168.2.3"]
 AvailabilityRatio = 8.23
+
+[Api]
+Host            = "api.myapp.com"
+Port            = 81
+Test            = false
+
+[Service1]
+Host            = "service1.myapp.com"
+Port            = 82
+
+[Service2]
+Host            = "service2.myapp.com"
+Port            = 83
+
+[Mongo]
+Scheme          = "mongodb"
+Host            = "localhost"
+Port            = 27017
+Username        = "admin"
+Password        = "admin"
+DBName          = "myDatabase"
