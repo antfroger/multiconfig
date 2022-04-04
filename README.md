@@ -1,4 +1,4 @@
-# Multiconfig [![GoDoc](https://godoc.org/github.com/koding/multiconfig?status.svg)](http://godoc.org/github.com/koding/multiconfig) [![Build Status](https://travis-ci.org/koding/multiconfig.svg?branch=master)](https://travis-ci.org/koding/multiconfig)
+# Multiconfig [![GoDoc](https://godoc.org/github.com/koding/multiconfig?status.svg)](http://godoc.org/github.com/koding/multiconfig) [![Build Status](https://github.com/ecochain-tech/multiconfig/actions/workflows/build.yaml/badge.svg)](https://github.com/ecochain-tech/multiconfig/actions)
 
 Load configuration from multiple sources. Multiconfig makes loading/parsing
 from different configuration sources an easy task. The problem with any app is
